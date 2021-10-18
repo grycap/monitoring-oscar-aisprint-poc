@@ -1,0 +1,49 @@
+functions:
+  oscar:
+  - oscar-cluster:
+      name: monitoring-input
+      image: ghcr.io/srisco/monitoring-oscar-aisprint-poc
+      script: monitoring-script.sh
+      environment:
+        Variables:
+          MONITORING_MODE: input
+          INFLUXDB_URL: http://xxxx
+          INFLUXDB_TOKEN: xxxx
+          INFLUXDB_ORG: test.org
+          INFLUXDB_BUCKET: xxxx
+          SERVICE_NAME: grayify
+          DOWNLOAD_INPUT: "false"
+      input:
+      - storage_provider: minio
+        path: grayify/in
+      output:
+      - storage_provider: minio
+        path: grayify/start
+  - oscar-cluster:
+      name: grayify
+      memory: 1Gi
+      cpu: '1.0'
+      image: ghcr.io/srisco/imagemagick
+      script: grayify.sh
+      input:
+      - storage_provider: minio
+        path: grayify/start
+      output:
+      - storage_provider: minio
+        path: grayify/out
+  - oscar-cluster:
+      name: monitoring-output
+      image: ghcr.io/srisco/monitoring-oscar-aisprint-poc
+      script: monitoring-script.sh
+      environment:
+        Variables:
+          MONITORING_MODE: output
+          INFLUXDB_URL: http://xxxx
+          INFLUXDB_TOKEN: xxxx
+          INFLUXDB_ORG: test.org
+          INFLUXDB_BUCKET: xxxx
+          SERVICE_NAME: grayify
+          DOWNLOAD_INPUT: "false"
+      input:
+      - storage_provider: minio
+        path: grayify/out

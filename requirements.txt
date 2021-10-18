@@ -1,0 +1,2 @@
+faas-supervisor==1.4.1b2
+influxdb-client==1.21.0
