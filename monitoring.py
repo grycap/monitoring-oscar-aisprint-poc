@@ -14,6 +14,7 @@
 import logging
 import os
 import uuid
+import distutils.util
 from datetime import datetime
 from faassupervisor.events import parse_event
 from faassupervisor.storage.config import StorageConfig, create_provider
@@ -46,8 +47,9 @@ def write_times(monitoring_mode, parsed_event, input_name):
     org = os.environ.get('INFLUXDB_ORG')
     bucket = os.environ.get('INFLUXDB_BUCKET')
     service_name = os.environ.get('SERVICE_NAME')
+    verify_ssl = bool(distutils.util.strtobool(os.environ.get('INFLUXDB_SSL_VERIFY', 'True')))
     # Create client
-    influx_client = InfluxDBClient(url=url, token=token, org=org)
+    influx_client = InfluxDBClient(url=url, token=token, org=org, verify_ssl=verify_ssl)
     logger.info(f'Writing times to InfluxDB ({url}) bucket \"{bucket}\"...')
     # Get event timestamp
     timestamp = string_time_to_timestamp(parsed_event.event_time)
